@@ -1,13 +1,8 @@
 ﻿using Common;
-using Common.Messaging;
-using Serilog;
-using Server.Core;
-using Server.Core.Pipes;
-using Server.Motion.Pipes;
-using Server.Motion.Services;
-using System;
+using Common.Services;
+using Plugins.Motion.Contracts;
+using SimpleInjector;
 using System.Threading;
-using System.Threading.Tasks.Dataflow;
 
 namespace Server
 {
@@ -15,19 +10,19 @@ namespace Server
     {
         public static void Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.Console()
-                .CreateLogger();
+            var container = new Container();
+            container.Options.DefaultLifestyle = Lifestyle.Singleton;
+            Startup.Register(container);
+            Plugins.Motion.Startup.Register(container);
 
-            var raiser = new OperationRaiser();
-            var builder = new PipelineBuilder();
-            builder.AddSender(raiser)
-                .AddPipe(new OdometryPipe(new OdometryProvider(), new KinematicsService()))
-                .AddPipe(new ProcessingInspectorPipe())
-                .Build();
-            raiser.Raise(new Message(MessageHeaders.Queries.AbsCoords));
-            raiser.Raise(new Message(MessageHeaders.Commands.Freeze));
+            var pipeline = container.GetInstance(typeof(PipelineBuilder)) as PipelineBuilder;
+            Startup.Build(container, pipeline);
+            Plugins.Motion.Startup.Build(container, pipeline);
+            pipeline.Build();
+
+            var raiser = container.GetInstance(typeof(IOperationRaiser)) as OperationRaiser;
+            raiser.Raise(new Message(MotionMessageHeaders.Queries.AbsCoords));
+            raiser.Raise(new Message(MotionMessageHeaders.Commands.Freeze));
             raiser.Raise(new Message(MessageHeaders.Event + "SomeEvent"));
             Thread.Sleep(1000);
         }
