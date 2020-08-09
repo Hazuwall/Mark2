@@ -6,6 +6,6 @@ namespace Common.Messaging
 {
     public interface IPipe
     {
-        Transaction Process(Transaction transaction);
+        void Process(Transaction transaction);
     }
 }

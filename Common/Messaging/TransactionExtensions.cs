@@ -6,19 +6,18 @@ namespace Common.Messaging
 {
     public static class TransactionExtensions
     {
-        public static Transaction ToTransaction(this RequestDto dto, Guid clientId, EndPoint ep)
+        public static Transaction ToTransaction(this RequestDto dto, Guid recieverId, EndPoint ep)
         {
-            return new Transaction(clientId, ep, dto.Id, dto.ProtocolVersion,
-                dto.TransactionType, dto.Flags, dto.Request ?? new List<Message>());
+            return new Transaction(dto.Id, recieverId, ep, dto.Version,
+                dto.Flags, dto.Operation);
         }
 
         public static ResponseDto ToResponse(this Transaction t)
         {
             return new ResponseDto()
             {
-                Id = t.Id,
-                TransactionType = t.TransactionType,
-                Response = t.Response
+                RequestId = t.Id,
+                Result = t.Result
             };
         }
     }

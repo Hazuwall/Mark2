@@ -1,13 +1,12 @@
-﻿using System;
+﻿using Common.Entities;
 
 namespace Common.Messaging
 {
-    public static class MessageTypes
+    public static class MessageHeaders
     {
         public const string Query = "Query/";
         public const string Command = "Command/";
         public const string Event = "Event/";
-        public const string Info = "Info/";
         public const string Error = "Error/";
 
         [MessageDeclarationCollection]
@@ -29,38 +28,13 @@ namespace Common.Messaging
         [MessageDeclarationCollection]
         public static class Commands
         {
-            public const string SetCoords = Command + "SetCoords";
-            public const string SetAbsCoords = Command + "SetAbsCoords";
-
-            [MessageDeclaration]
+            [MessageDeclaration(Level = AccessLevel.Admin)]
             public const string Freeze = Command + "Freeze";
-
-            [MessageDeclaration]
-            public const string NotifyQuequePointPassed = Command + "NotifyQuequePointPassed";
         }
 
         [MessageDeclarationCollection]
         public static class Events
         {
-            [MessageDeclaration]
-            public const string QuequePointPassed = Event + "QuequePointPassed";
-        }
-
-        [MessageDeclarationCollection]
-        public static class Infos
-        {
-            [MessageDeclaration]
-            public const string Ok = Info + "Ok";
-        }
-
-        [MessageDeclarationCollection]
-        public static class Errors
-        {
-            [MessageDeclaration(Out = typeof(string))]
-            public const string AccessDenied = Error + "AccessDenied";
-
-            [MessageDeclaration(Out = typeof(string))]
-            public const string Calculation = Error + "Calculation";
         }
     }
 }

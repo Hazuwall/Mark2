@@ -2,18 +2,20 @@
 {
     public class Message
     {
-        public string MessageType { get; }
+        public string Header { get; }
         public object Payload { get; }
 
-        public Message(string type, object payload)
+        public Message(string header, object payload)
         {
-            MessageType = type;
+            Header = header;
             Payload = payload;
         }
 
+        public Message(string header):this(header, null) { }
+
         public override string ToString()
         {
-            return MessageType;
+            return Header;
         }
     }
 }

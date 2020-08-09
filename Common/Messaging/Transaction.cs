@@ -6,34 +6,28 @@ namespace Common.Messaging
 {
     public class Transaction
     {
-        public Transaction(Guid clientId, EndPoint endPoint, Guid id, int protocolVersion,
-                           TransactionType transactionType, string[] flags, List<Message> messages)
+        public Transaction(Guid id, Guid recieverId, EndPoint endPoint, int protocolVersion, string[] flags,
+                           Message operation)
         {
-            ClientId = clientId;
-            EndPoint = endPoint;
             Id = id;
+            RecieverId = recieverId;
+            EndPoint = endPoint;
             ProtocolVersion = protocolVersion;
-            TransactionType = transactionType;
             Flags = flags;
-            Messages = messages;
-            Response = new Message[transactionType == TransactionType.Query ?
-                messages.Count
-                :
-                1];
+            Operation = operation;
         }
 
-        public Guid ClientId { get; }
-        public EndPoint EndPoint { get; }
         public Guid Id { get; }
+        public Guid RecieverId { get; }
+        public EndPoint EndPoint { get; }
         public int ProtocolVersion { get; }
-        public TransactionType TransactionType { get; }
         public string[] Flags { get; }
-        public List<Message> Messages { get; }
-        public Message[] Response { get; }
+        public Message Operation { get; set; }
+        public Message Result { get; set; }
 
         public override string ToString()
         {
-            return $"Type: {TransactionType}, Id: {Id}";
+            return $"Operation: {Operation}, Id: {Id}";
         }
     }
 }
