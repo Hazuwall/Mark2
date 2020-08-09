@@ -1,6 +1,8 @@
 ﻿using Common;
+using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks.Dataflow;
 
 namespace Server
@@ -13,6 +15,7 @@ namespace Server
         private readonly List<IReciever> _recievers = new List<IReciever>();
         private readonly List<IDisposable> _disposables = new List<IDisposable>();
         private readonly PipeWrapper _pipeWrapper = new PipeWrapper();
+        private readonly List<string> _presentationList = new List<string>();
 
         public PipelineBuilder AddSender(ISender sender)
         {
@@ -33,6 +36,7 @@ namespace Server
                 _disposables.Add(disp);
             }
             _last = block;
+            _presentationList.Add(pipe.GetType().Name);
             return this;
         }
 
@@ -54,6 +58,7 @@ namespace Server
             {
                 disp = sender.SourceBlock.LinkTo(_first);
                 _disposables.Add(disp);
+                _presentationList.Insert(0,sender.GetType().Name);
             }
 
             //forward single output transaction instance to all recievers
@@ -65,11 +70,17 @@ namespace Server
             {
                 disp = broadcast.LinkTo(reciever.TargetBlock);
                 _disposables.Add(disp);
+                _presentationList.Add(reciever.GetType().Name);
+            }
+            if (Log.IsEnabled(Serilog.Events.LogEventLevel.Information))
+            {
+                Log.Information("A pipeline is built: {0}", string.Join(", ", _presentationList));
             }
             _first = null;
             _last = null;
             _senders.Clear();
             _recievers.Clear();
+            _presentationList.Clear();
         }
 
         public void Dispose()
