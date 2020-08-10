@@ -5,10 +5,16 @@ namespace Common
 {
     public class Transaction
     {
-        public Transaction(Guid id, Guid recieverId, EndPoint endPoint, int protocolVersion, string[] flags,
+        public Transaction(Guid id,
+                           Guid senderId,
+                           Guid recieverId,
+                           EndPoint endPoint,
+                           int protocolVersion,
+                           string[] flags,
                            Message operation)
         {
             Id = id;
+            SenderId = senderId;
             RecieverId = recieverId;
             EndPoint = endPoint;
             ProtocolVersion = protocolVersion;
@@ -17,6 +23,7 @@ namespace Common
         }
 
         public Guid Id { get; }
+        public Guid SenderId { get; }
         public Guid RecieverId { get; }
         public EndPoint EndPoint { get; }
         public int ProtocolVersion { get; }

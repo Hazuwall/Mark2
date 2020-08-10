@@ -6,23 +6,23 @@ using System.Threading.Tasks.Dataflow;
 
 namespace Server
 {
-    public class OperationRaiser : ISender, IOperationRaiser
+    public class EventRaiser : ISender, IEventRaiser
     {
         private readonly BufferBlock<Transaction> _sourceBlock = new BufferBlock<Transaction>();
 
         public Guid Id { get; } = Guid.NewGuid();
         public ISourceBlock<Transaction> SourceBlock => _sourceBlock;
 
-
-        public void Raise(Message operation, Guid recieverId, EndPoint ep)
+        public void Raise(string eventName, EventArgs args, Guid recieverId, EndPoint ep)
         {
-            var transaction = new Transaction(Guid.Empty, recieverId, ep, 1, null, operation);
+            var operation = new Message(eventName, args);
+            var transaction = new Transaction(Guid.Empty, Id, recieverId, ep, 1, null, operation);
             _sourceBlock.Post(transaction);
         }
 
-        public void Raise(Message operation)
+        public void Raise(string eventName, EventArgs args)
         {
-            Raise(operation, Guid.Empty, null);
+            Raise(eventName, args, Guid.Empty, null);
         }
     }
 }

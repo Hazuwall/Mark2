@@ -74,7 +74,7 @@ namespace Server
             }
             if (Log.IsEnabled(Serilog.Events.LogEventLevel.Information))
             {
-                Log.Information("A pipeline is built: {0}", string.Join(", ", _presentationList));
+                Log.Information("A pipeline is built: {0}", string.Join(" -> ", _presentationList));
             }
             _first = null;
             _last = null;

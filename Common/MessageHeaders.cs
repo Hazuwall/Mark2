@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Common
 {
@@ -12,6 +13,9 @@ namespace Common
         [MessageDeclarationCollection]
         public static class Queries
         {
+            [MessageDeclaration(Out = typeof(AccessLevel))]
+            public const string AccessLevel = Query + "AccessLevel";
+
             [MessageDeclaration(Out = typeof(Dictionary<string,MessageDeclarationAttribute>))]
             public const string Help = Query + "Help";
         }
@@ -19,11 +23,15 @@ namespace Common
         [MessageDeclarationCollection]
         public static class Commands
         {
+            [MessageDeclaration(In = typeof(AccessLevel), Out = typeof(AccessDisputeStatus))]
+            public const string ClaimAccessLevel = Command + "ClaimAccessLevel";
         }
 
         [MessageDeclarationCollection]
         public static class Events
         {
+            [MessageDeclaration(Out = typeof(AccessDisputeEventArgs))]
+            public const string AccessDisputeEvent = Event + "AccessDisputeEvent";
         }
     }
 }

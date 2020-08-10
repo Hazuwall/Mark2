@@ -6,7 +6,6 @@ namespace Server
 {
     public interface ISender
     {
-        public Guid Id { get; }
         public ISourceBlock<Transaction> SourceBlock { get; }
     }
 }

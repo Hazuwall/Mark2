@@ -17,9 +17,13 @@ namespace Server
 
             container.Register<IPipelineBuilder, PipelineBuilder>();
             container.Register<PipelineBuilder>();
-            container.Register<IOperationRaiser, OperationRaiser>();
-            container.Register<OperationRaiser>();
+            container.Register<IEventRaiser, EventRaiser>();
+            container.Register<EventRaiser>();
             container.Register<IMessageDeclarationRegistry, MessageDeclarationRegistry>();
+            container.Register<IClientAccessRegistry, ClientAccessRegistry>();
+            container.Register<IClientAccessController, ClientAccessController>();
+            container.Register<IClientAccessDisputeFactory, ClientAccessDisputeFactory>();
+            container.Register<AccessPipe>();
             container.Register<HelpPipe>();
             container.Register<ProcessingInspectorPipe>();
         }
@@ -27,7 +31,8 @@ namespace Server
         public static void BeginBuild(Container container, PipelineBuilder pipeline)
         {
             pipeline
-                .AddSender(container.GetInstance(typeof(OperationRaiser)) as ISender)
+                .AddSender(container.GetInstance(typeof(EventRaiser)) as ISender)
+                .AddPipe(container.GetInstance(typeof(AccessPipe)) as IPipe)
                 .AddPipe(container.GetInstance(typeof(HelpPipe)) as IPipe);
         }
 

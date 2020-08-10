@@ -19,13 +19,6 @@ namespace Server
             Startup.BeginBuild(container, pipeline);
             Plugins.Motion.Startup.Build(container, pipeline);
             Startup.EndBuild(container, pipeline);
-
-            var raiser = container.GetInstance(typeof(IOperationRaiser)) as OperationRaiser;
-            raiser.Raise(new Message(MotionMessageHeaders.Queries.AbsCoords));
-            raiser.Raise(new Message(MotionMessageHeaders.Commands.Freeze));
-            raiser.Raise(new Message(MessageHeaders.Event + "SomeEvent"));
-            raiser.Raise(new Message(MessageHeaders.Queries.Help));
-            Thread.Sleep(1000);
         }
     }
 }

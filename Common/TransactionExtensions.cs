@@ -5,9 +5,9 @@ namespace Common
 {
     public static class TransactionExtensions
     {
-        public static Transaction ToTransaction(this RequestDto dto, Guid recieverId, EndPoint ep)
+        public static Transaction ToTransaction(this RequestDto dto, Guid senderId, Guid recieverId, EndPoint ep)
         {
-            return new Transaction(dto.Id, recieverId, ep, dto.Version,
+            return new Transaction(dto.Id, senderId, recieverId, ep, dto.Version,
                 dto.Flags, dto.Operation);
         }
 

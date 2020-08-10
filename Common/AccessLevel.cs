@@ -2,8 +2,8 @@
 {
     public enum AccessLevel
     {
-        Read,
-        Write,
-        Admin
+        Read = 0,
+        Write = 1,
+        Admin = 2
     }
 }

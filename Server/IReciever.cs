@@ -6,7 +6,6 @@ namespace Server
 {
     public interface IReciever
     {
-        public Guid Id { get; }
         public ITargetBlock<Transaction> TargetBlock { get; }
     }
 }
