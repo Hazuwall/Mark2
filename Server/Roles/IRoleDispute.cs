@@ -1,15 +1,15 @@
 ﻿using Common;
 using System;
 
-namespace Server
+namespace Server.Roles
 {
-    public interface IClientAccessDispute
+    public interface IRoleDispute
     {
         bool IsResolved { get; }
         bool IsDefended { get; }
         Guid Claimant { get; }
         Guid Defendant { get; }
-        AccessLevel Level { get; }
+        Role Role { get; }
         void Open(int timeMs);
         void Defend();
     }

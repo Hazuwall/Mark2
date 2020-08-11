@@ -4,31 +4,31 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Server
+namespace Server.Roles
 {
-    public sealed class ClientAccessDispute : IClientAccessDispute
+    public sealed class RoleDispute : IRoleDispute
     {
         private readonly IEventRaiser _raiser;
-        private readonly IClientAccessRegistry _registry;
+        private readonly IClientRoleRegistry _registry;
         private CancellationTokenSource _cancellationSource;
         private volatile bool _isResolved = false;
 
-        public ClientAccessDispute(Guid claimant,
-                                   Guid defendant,
-                                   AccessLevel level,
-                                   IClientAccessRegistry registry,
-                                   IEventRaiser raiser)
+        public RoleDispute(Guid claimant,
+                           Guid defendant,
+                           Role role,
+                           IClientRoleRegistry registry,
+                           IEventRaiser raiser)
         {
             Claimant = claimant;
             Defendant = defendant;
-            Level = level;
+            Role = role;
             _raiser = raiser;
             _registry = registry;
         }
 
         public Guid Claimant { get; }
         public Guid Defendant { get; }
-        public AccessLevel Level { get; }
+        public Role Role { get; }
         public bool IsResolved => _isResolved;
         public bool IsDefended { get; private set; }
 
@@ -38,14 +38,14 @@ namespace Server
             {
                 _cancellationSource = new CancellationTokenSource();
                 _raiser.Raise(
-                    MessageHeaders.Events.AccessDisputeEvent,
-                    new AccessDisputeEventArgs
+                    MessageHeaders.Events.RoleDisputeEvent,
+                    new RoleDisputeEventArgs
                     {
-                        Status = AccessDisputeStatus.Opened,
-                        Level = Level
+                        Status = RoleDisputeStatus.Opened,
+                        Role = Role
                     },
                     Defendant, null);
-                _ = TryClaimAsync(timeMs, _cancellationSource.Token);
+                TryClaimAsync(timeMs, _cancellationSource.Token).Start();
             }
         }
 
@@ -80,23 +80,23 @@ namespace Server
         private void Resolve(Guid winner, Guid loser)
         {
             _isResolved = true;
-            _registry.SetClientAccessLevel(Level, winner);
-            _registry.SetClientAccessLevel(AccessLevel.Read, loser);
+            _registry.SetClientRole(winner, Role);
+            _registry.SetClientRole(loser, Role.Reader);
 
             _raiser.Raise(
-                MessageHeaders.Events.AccessDisputeEvent,
-                new AccessDisputeEventArgs
+                MessageHeaders.Events.RoleDisputeEvent,
+                new RoleDisputeEventArgs
                 {
-                    Status = AccessDisputeStatus.Won,
-                    Level = Level
+                    Status = RoleDisputeStatus.Won,
+                    Role = Role
                 },
                 winner, null);
             _raiser.Raise(
-                MessageHeaders.Events.AccessDisputeEvent,
-                new AccessDisputeEventArgs
+                MessageHeaders.Events.RoleDisputeEvent,
+                new RoleDisputeEventArgs
                 {
-                    Status = AccessDisputeStatus.Lost,
-                    Level = Level
+                    Status = RoleDisputeStatus.Lost,
+                    Role = Role
                 },
                 loser, null);
         }

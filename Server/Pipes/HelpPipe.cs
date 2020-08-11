@@ -7,9 +7,9 @@ namespace Server.Pipes
 {
     public class HelpPipe : IPipe
     {
-        private readonly IMessageDeclarationRegistry _registry;
+        private readonly IMessageInfoRegistry _registry;
 
-        public HelpPipe(IMessageDeclarationRegistry registry)
+        public HelpPipe(IMessageInfoRegistry registry)
         {
             _registry = registry;
         }
@@ -18,7 +18,7 @@ namespace Server.Pipes
         {
             if(transaction.Operation.Header == MessageHeaders.Queries.Help)
             {
-                transaction.Result = new Message(MessageHeaders.Queries.Help, _registry.Declarations);
+                transaction.Result = new Message(MessageHeaders.Queries.Help, _registry.Dictionary);
             }
         }
     }

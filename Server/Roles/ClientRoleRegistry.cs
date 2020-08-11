@@ -2,28 +2,28 @@
 using Serilog;
 using System;
 
-namespace Server
+namespace Server.Roles
 {
-    public class ClientAccessRegistry : IClientAccessRegistry
+    public class ClientRoleRegistry : IClientRoleRegistry
     {
         private Guid? _adminClient = null;
         private Guid? _writeClient = null;
         private readonly object _lock = new object();
 
-        public Guid? GetOwner(AccessLevel level)
+        public Guid? GetOwner(Role role)
         {
             lock (_lock)
             {
-                return level switch
+                return role switch
                 {
-                    AccessLevel.Write => _writeClient,
-                    AccessLevel.Admin => _adminClient,
+                    Role.Writer => _writeClient,
+                    Role.Admin => _adminClient,
                     _ => null,
                 };
             }
         }
 
-        public AccessLevel GetAccessLevel(Guid client)
+        public Role GetRole(Guid client)
         {
             if (client == null)
                 throw new ArgumentNullException(nameof(client));
@@ -31,19 +31,19 @@ namespace Server
             lock (_lock)
             {
                 if (_writeClient == client)
-                    return AccessLevel.Write;
+                    return Role.Writer;
                 else if (_adminClient == client)
-                    return AccessLevel.Admin;
+                    return Role.Admin;
                 else
-                    return AccessLevel.Read;
+                    return Role.Reader;
             }
         }
 
-        public void SetClientAccessLevel(AccessLevel level, Guid client)
+        public void SetClientRole(Guid client, Role role)
         {
             if (Log.IsEnabled(Serilog.Events.LogEventLevel.Information))
             {
-                Log.Information("An access level {0} is granted to client {1}.", level, client);
+                Log.Information("The {0} role is granted to client {1}.", role, client);
             }
             lock (_lock)
             {
@@ -52,12 +52,12 @@ namespace Server
                 if (_adminClient.HasValue && _adminClient.Value == client)
                     _adminClient = null;
 
-                switch (level)
+                switch (role)
                 {
-                    case AccessLevel.Write:
+                    case Role.Writer:
                         _writeClient = client;
                         break; ;
-                    case AccessLevel.Admin:
+                    case Role.Admin:
                         _adminClient = client;
                         break;
                     default:

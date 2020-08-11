@@ -10,28 +10,28 @@ namespace Common
         public const string Event = "Event/";
         public const string Error = "Error/";
 
-        [MessageDeclarationCollection]
+        [MessageInfoCollection]
         public static class Queries
         {
-            [MessageDeclaration(Out = typeof(AccessLevel))]
-            public const string AccessLevel = Query + "AccessLevel";
+            [MessageInfo(Out = typeof(Role))]
+            public const string Role = Query + "Role";
 
-            [MessageDeclaration(Out = typeof(Dictionary<string,MessageDeclarationAttribute>))]
+            [MessageInfo(Out = typeof(Dictionary<string,MessageInfoAttribute>))]
             public const string Help = Query + "Help";
         }
 
-        [MessageDeclarationCollection]
+        [MessageInfoCollection]
         public static class Commands
         {
-            [MessageDeclaration(In = typeof(AccessLevel), Out = typeof(AccessDisputeStatus))]
-            public const string ClaimAccessLevel = Command + "ClaimAccessLevel";
+            [MessageInfo(In = typeof(Role), Out = typeof(bool))]
+            public const string ClaimRole = Command + "ClaimRole";
         }
 
-        [MessageDeclarationCollection]
+        [MessageInfoCollection]
         public static class Events
         {
-            [MessageDeclaration(Out = typeof(AccessDisputeEventArgs))]
-            public const string AccessDisputeEvent = Event + "AccessDisputeEvent";
+            [MessageInfo(Out = typeof(RoleDisputeEventArgs))]
+            public const string RoleDisputeEvent = Event + "RoleDisputeEvent";
         }
     }
 }

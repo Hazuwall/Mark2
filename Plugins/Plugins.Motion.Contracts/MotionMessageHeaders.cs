@@ -8,30 +8,30 @@ namespace Plugins.Motion.Contracts
         private const string Command = MessageHeaders.Command;
         private const string Event = MessageHeaders.Event;
 
-        [MessageDeclarationCollection]
+        [MessageInfoCollection]
         public static class Queries
         {
-            [MessageDeclaration(Out = typeof(Vector6))]
+            [MessageInfo(Out = typeof(Vector6))]
             public const string Coords = Query + "Coords";
 
-            [MessageDeclaration(Out = typeof(Vector6))]
+            [MessageInfo(Out = typeof(Vector6))]
             public const string AbsCoords = Query + "AbsCoords";
 
-            [MessageDeclaration(Out = typeof(Vector6))]
+            [MessageInfo(Out = typeof(Vector6))]
             public const string Velocities = Query + "Velocities";
 
-            [MessageDeclaration(Out = typeof(Vector6))]
+            [MessageInfo(Out = typeof(Vector6))]
             public const string AbsVelocities = Query + "AbsVelocities";
         }
 
-        [MessageDeclarationCollection]
+        [MessageInfoCollection]
         public static class Commands
         {
-            [MessageDeclaration(Level = AccessLevel.Admin)]
+            [MessageInfo(Role = Role.Admin)]
             public const string Freeze = Command + "Freeze";
         }
 
-        [MessageDeclarationCollection]
+        [MessageInfoCollection]
         public static class Events
         {
         }

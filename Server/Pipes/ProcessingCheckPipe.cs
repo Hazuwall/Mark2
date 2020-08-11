@@ -3,7 +3,7 @@ using System;
 
 namespace Server.Pipes
 {
-    public class ProcessingInspectorPipe : IPipe
+    public class ProcessingCheckPipe : IPipe
     {
         public void Process(Transaction transaction)
         {
@@ -16,7 +16,7 @@ namespace Server.Pipes
                 }
                 else
                 {
-                    throw new InvalidOperationException("Operation is not processed.");
+                    throw new InvalidOperationException("The operation is not processed.");
                 }
             }
         }

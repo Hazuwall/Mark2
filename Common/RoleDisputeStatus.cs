@@ -1,6 +1,6 @@
 ﻿namespace Common
 {
-    public enum AccessDisputeStatus
+    public enum RoleDisputeStatus
     {
         Opened,
         Won,
