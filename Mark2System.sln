@@ -7,11 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csproj", "{F715F020-560A-407F-8872-32BD3C585724}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{9F06F521-9F6B-413F-80CE-F73E7D5FF91A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{9F06F521-9F6B-413F-80CE-F73E7D5FF91A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugins.Motion.Contracts", "Plugins\Plugins.Motion.Contracts\Plugins.Motion.Contracts.csproj", "{F647CB18-A0DC-4F2D-BAA5-892801D24AEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugins.Motion.Contracts", "Plugins\Plugins.Motion.Contracts\Plugins.Motion.Contracts.csproj", "{F647CB18-A0DC-4F2D-BAA5-892801D24AEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugins.Motion", "Plugins\Plugins.Motion\Plugins.Motion.csproj", "{9E40E265-6062-4B0B-83E1-F7707A04F026}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugins.Motion", "Plugins\Plugins.Motion\Plugins.Motion.csproj", "{9E40E265-6062-4B0B-83E1-F7707A04F026}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
