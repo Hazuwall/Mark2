@@ -9,7 +9,7 @@ namespace Server.Pipes
         {
             if (transaction.Operation != null)
             {
-                if (transaction.Operation.Header.StartsWith(MessageHeaders.Event))
+                if (transaction.Operation.Header.StartsWith(MessageHeaders.Families.Event))
                 {
                     transaction.Result = transaction.Operation;
                     transaction.Operation = null;

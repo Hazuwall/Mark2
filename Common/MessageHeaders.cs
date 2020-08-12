@@ -3,35 +3,61 @@ using System.Collections.Generic;
 
 namespace Common
 {
+    [MessageInfoCollection]
     public static class MessageHeaders
     {
-        public const string Query = "Query/";
-        public const string Command = "Command/";
-        public const string Event = "Event/";
-        public const string Error = "Error/";
+        public static class Families
+        {
+            public static readonly string Query = "Query/";
+            public static readonly string Command = "Command/";
+            public static readonly string Event = "Event/";
+            public static readonly string Error = "Error/";
+        }
 
-        [MessageInfoCollection]
         public static class Queries
         {
-            [MessageInfo(Out = typeof(Role))]
-            public const string Role = Query + "Role";
+            static Queries()
+            {
+                DeclarationHelper.FillStringStaticFieldsWithNames(typeof(Queries), prefix: Families.Query);
+            }
 
-            [MessageInfo(Out = typeof(Dictionary<string,MessageInfoAttribute>))]
-            public const string Help = Query + "Help";
+            [MessageInfo(
+                Out = typeof(Role),
+                Summary = "Узнать текущую роль.")]
+            public static readonly string Role;
+
+
+            [MessageInfo(
+                Out = typeof(Dictionary<string, MessageInfoAttribute>),
+                Summary = "Получить список с описанием всех зарегистрированных операций.")]
+            public static readonly string Help;
         }
 
-        [MessageInfoCollection]
         public static class Commands
         {
-            [MessageInfo(In = typeof(Role), Out = typeof(bool))]
-            public const string ClaimRole = Command + "ClaimRole";
+            static Commands()
+            {
+                DeclarationHelper.FillStringStaticFieldsWithNames(typeof(Commands), prefix: Families.Command);
+            }
+
+            [MessageInfo(
+                In = typeof(Role), Out = typeof(bool),
+                Summary = "Подать заявление на роль. Если роль занята, то будет открыт спор, " +
+                "в течение которого текущий владелец для сохранения роли должен повторно подать заявление.")]
+            public static readonly string ClaimRole;
         }
 
-        [MessageInfoCollection]
         public static class Events
         {
-            [MessageInfo(Out = typeof(RoleDisputeEventArgs))]
-            public const string RoleDisputeEvent = Event + "RoleDisputeEvent";
+            static Events()
+            {
+                DeclarationHelper.FillStringStaticFieldsWithNames(typeof(Events), prefix: Families.Event);
+            }
+
+            [MessageInfo(
+                Out = typeof(RoleDisputeEventArgs),
+                Summary = "Происходит при открытии или закрытии спора о роли.")]
+            public static readonly string RoleDisputeEvent;
         }
     }
 }

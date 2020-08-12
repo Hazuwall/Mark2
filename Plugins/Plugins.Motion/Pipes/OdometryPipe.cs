@@ -17,28 +17,29 @@ namespace Plugins.Motion.Pipes
         public void Process(Transaction transaction)
         {
             object data = null;
-            switch (transaction.Operation.Header)
+            var header = transaction.Operation.Header;
+            if(header == MotionMessageHeaders.Queries.Coords)
             {
-                case MotionMessageHeaders.Queries.Coords:
-                    data = _odometry.GetCoords();
-                    break;
-                case MotionMessageHeaders.Queries.Velocities:
-                    data = _odometry.GetVelocities();
-                    break;
-                case MotionMessageHeaders.Queries.AbsCoords:
-                    var coords = _odometry.GetCoords();
-                    data = _kinematics.ForwardPosTransform(coords);
-                    break;
-                case MotionMessageHeaders.Queries.AbsVelocities:
-                    var velocities = _odometry.GetCoords();
-                    data = _kinematics.ForwardVelocityTransform(velocities);
-                    break;
-                default:
-                    break;
+                data = _odometry.GetCoords();
             }
+            else if(header == MotionMessageHeaders.Queries.Velocities)
+            {
+                data = _odometry.GetVelocities();
+            }
+            else if (header == MotionMessageHeaders.Queries.AbsCoords)
+            {
+                var coords = _odometry.GetCoords();
+                data = _kinematics.ForwardPosTransform(coords);
+            }
+            else if (header == MotionMessageHeaders.Queries.AbsVelocities)
+            {
+                var velocities = _odometry.GetCoords();
+                data = _kinematics.ForwardVelocityTransform(velocities);
+            }
+
             if (data != null)
             {
-                transaction.Result = new Message(transaction.Operation.Header, data);
+                transaction.Result = new Message(header, data);
                 transaction.Operation = null;
             }
         }

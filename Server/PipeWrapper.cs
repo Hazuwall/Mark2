@@ -18,7 +18,7 @@ namespace Server
                 }
                 catch (Exception ex)
                 {
-                    t.Result = new Message(MessageHeaders.Error + ex.GetType().Name, ex);
+                    t.Result = new Message(MessageHeaders.Families.Error + ex.GetType().Name, ex);
                     if (Log.IsEnabled(Serilog.Events.LogEventLevel.Error))
                     {
                         Log.Error(ex, "An error occured while processing {0} operation.", t.Operation);

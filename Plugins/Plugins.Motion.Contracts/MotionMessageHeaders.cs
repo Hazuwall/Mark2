@@ -2,38 +2,51 @@
 
 namespace Plugins.Motion.Contracts
 {
+    [MessageInfoCollection]
     public static class MotionMessageHeaders
     {
-        private const string Query = MessageHeaders.Query;
-        private const string Command = MessageHeaders.Command;
-        private const string Event = MessageHeaders.Event;
-
-        [MessageInfoCollection]
         public static class Queries
         {
-            [MessageInfo(Out = typeof(Vector6))]
-            public const string Coords = Query + "Coords";
+            static Queries()
+            {
+                DeclarationHelper.FillStringStaticFieldsWithNames(typeof(Queries), prefix: MessageHeaders.Families.Query);
+            }
 
-            [MessageInfo(Out = typeof(Vector6))]
-            public const string AbsCoords = Query + "AbsCoords";
+            [MessageInfo(
+                Out = typeof(Vector6))]
+            public static readonly string Coords;
 
-            [MessageInfo(Out = typeof(Vector6))]
-            public const string Velocities = Query + "Velocities";
+            [MessageInfo(
+                Out = typeof(Vector6))]
+            public static readonly string AbsCoords;
 
-            [MessageInfo(Out = typeof(Vector6))]
-            public const string AbsVelocities = Query + "AbsVelocities";
+            [MessageInfo(
+                Out = typeof(Vector6))]
+            public static readonly string Velocities;
+
+            [MessageInfo(
+                Out = typeof(Vector6))]
+            public static readonly string AbsVelocities;
         }
 
-        [MessageInfoCollection]
         public static class Commands
         {
-            [MessageInfo(Role = Role.Admin)]
-            public const string Freeze = Command + "Freeze";
+            static Commands()
+            {
+                DeclarationHelper.FillStringStaticFieldsWithNames(typeof(Commands), prefix: MessageHeaders.Families.Command);
+            }
+
+            [MessageInfo(
+                Role = Role.Admin)]
+            public static readonly string Freeze;
         }
 
-        [MessageInfoCollection]
         public static class Events
         {
+            static Events()
+            {
+                DeclarationHelper.FillStringStaticFieldsWithNames(typeof(Events), prefix: MessageHeaders.Families.Event);
+            }
         }
     }
 }
