@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 
 namespace Common
 {
@@ -7,6 +8,7 @@ namespace Common
         public Guid Id { get; set; }
         public int Version { get; set; }
         public string[] Flags { get; set; }
-        public Message Operation { get; set; }
+        public string Header { get; set; }
+        public JToken Payload { get; set; }
     }
 }
