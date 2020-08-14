@@ -1,16 +1,19 @@
 ﻿using Common;
+using Microsoft.AspNetCore.Mvc;
+using Server.Roles;
 using System;
 using System.Collections.Generic;
 
-namespace Server.Roles
+namespace Server.Controllers
 {
-    public class RoleManager : IRoleManager
+    [Route("api/[controller]/[action]")]
+    public class RoleController : ControllerBase
     {
         private readonly IClientRoleRegistry _registry;
         private readonly IRoleDisputeFactory _disputeFactory;
         private readonly Dictionary<Role, IRoleDispute> _disputes;
 
-        public RoleManager(IClientRoleRegistry registry, IRoleDisputeFactory disputeFactory)
+        public RoleController(IClientRoleRegistry registry, IRoleDisputeFactory disputeFactory)
         {
             _registry = registry;
             _disputeFactory = disputeFactory;
@@ -21,28 +24,31 @@ namespace Server.Roles
             };
         }
 
-        public Role GetRole(Guid clientId)
+        [HttpGet]
+        public IActionResult Get()
         {
-            return _registry.GetRole(clientId);
+            return Ok((Role)HttpContext.Items[CookieAuthenticationMiddleware.ClientRoleKey]);
         }
 
-        public bool ClaimRole(Guid client, Role requestedRole)
+        [HttpPost]
+        public IActionResult Claim([FromBody] Role requestedRole)
         {
+            var client = (Guid)HttpContext.Items[CookieAuthenticationMiddleware.ClientIdKey];
             var currentRole = _registry.GetRole(client);
             var owner = _registry.GetOwner(requestedRole);
             if (currentRole == requestedRole)
             {
-                return TryDefend(client, requestedRole);
+                return Ok(TryDefend(client, requestedRole));
             }
             else if (!owner.HasValue)
             {
                 _registry.SetClientRole(client, requestedRole);
-                return true;
+                return Ok(true);
             }
             else
             {
                 TryOpenDispute(client, owner.Value, requestedRole);
-                return false;
+                return Ok(false);
             }
         }
 

@@ -1,49 +1,64 @@
-﻿using Common;
+using Common;
 using Common.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Serilog;
-using Server.Pipes;
+using Server.Operations;
 using Server.Roles;
-using SimpleInjector;
 
 namespace Server
 {
-    public static class Startup
+    public class Startup
     {
-        public static void Register(Container container)
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
+        public void ConfigureServices(IServiceCollection services)
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Console()
                 .CreateLogger();
 
-            container.Register<IPipelineBuilder, PipelineBuilder>();
-            container.Register<PipelineBuilder>();
-            container.Register<IEventRaiser, EventRaiser>();
-            container.Register<EventRaiser>();
-            container.Register<IMessageInfoRegistry, MessageInfoRegistry>();
-            container.Register<IClientRoleRegistry, ClientRoleRegistry>();
-            container.Register<IRoleManager, RoleManager>();
-            container.Register<IRoleDisputeFactory, RoleDisputeFactory>();
-            container.Register<AccessVerificationPipe>();
-            container.Register<RoleManagementPipe>();
-            container.Register<HelpPipe>();
-            container.Register<ProcessingCheckPipe>();
+            services.AddControllers().AddNewtonsoftJson();
+            services.AddSingleton<IClientRoleRegistry, ClientRoleRegistry>();
+            services.AddSingleton<IApiDeclaraionRegistry, ReflectionApiDeclarationRegistry>();
+            services.AddSingleton<CookieAuthenticationMiddleware>();
+            services.AddSingleton<OperationPipelineBuilder>();
+            services.AddSingleton<IOperationPipelineBuilder, OperationPipelineBuilder>();
+            services.AddScoped<IRoleDisputeFactory, RoleDisputeFactory>();
+            services.AddScoped<IEventRaiser, EventRaiser>();
+            
+            Plugins.Motion.Startup.ConfigureServices(services);
         }
 
-        public static void BeginBuild(Container container, PipelineBuilder pipeline)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, OperationPipelineBuilder pipelineBuilder)
         {
-            pipeline
-                .AddSender(container.GetInstance(typeof(EventRaiser)) as ISender)
-                .AddPipe(container.GetInstance(typeof(AccessVerificationPipe)) as IPipe)
-                .AddPipe(container.GetInstance(typeof(RoleManagementPipe)) as IPipe)
-                .AddPipe(container.GetInstance(typeof(HelpPipe)) as IPipe);
-        }
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
 
-        public static void EndBuild(Container container, PipelineBuilder pipeline)
-        {
-            pipeline
-                .AddPipe(container.GetInstance(typeof(ProcessingCheckPipe)) as IPipe)
-                .Build();
+            app.UseStaticFiles();
+
+            app.UseRouting();
+
+            app.UseMiddleware<CookieAuthenticationMiddleware>();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+
+            Plugins.Motion.Startup.Configure(pipelineBuilder, app.ApplicationServices);
+            pipelineBuilder.Build();
         }
     }
 }

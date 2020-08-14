@@ -27,7 +27,6 @@
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\Plugins\Plugins.Motion.Contracts\Plugins.Motion.Contracts.csproj" />
     <ProjectReference Include="..\Plugins\Plugins.Motion\Plugins.Motion.csproj" />
-    <ProjectReference Include="..\Server\Server.csproj" />
   </ItemGroup>
 
 </Project>

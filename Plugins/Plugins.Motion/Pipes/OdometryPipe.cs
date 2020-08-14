@@ -14,33 +14,26 @@ namespace Plugins.Motion.Pipes
             _kinematics = kinematics;
         }
 
-        public void Process(Transaction transaction)
+        public void Process(OperationContext context)
         {
-            object data = null;
-            var header = transaction.Operation.Header;
-            if(header == MotionMessageHeaders.Queries.Coords)
+            var title = context.CurrentOperation.Title;
+            if(title == MotionOperations.Queries.Coords)
             {
-                data = _odometry.GetCoords();
+                context.Complete(_odometry.GetCoords());
             }
-            else if(header == MotionMessageHeaders.Queries.Velocities)
+            else if(title == MotionOperations.Queries.Velocities)
             {
-                data = _odometry.GetVelocities();
+                context.Complete(_odometry.GetVelocities());
             }
-            else if (header == MotionMessageHeaders.Queries.AbsCoords)
+            else if (title == MotionOperations.Queries.AbsCoords)
             {
                 var coords = _odometry.GetCoords();
-                data = _kinematics.ForwardPosTransform(coords);
+                context.Complete(_kinematics.ForwardPosTransform(coords));
             }
-            else if (header == MotionMessageHeaders.Queries.AbsVelocities)
+            else if (title == MotionOperations.Queries.AbsVelocities)
             {
                 var velocities = _odometry.GetCoords();
-                data = _kinematics.ForwardVelocityTransform(velocities);
-            }
-
-            if (data != null)
-            {
-                transaction.Result = new Message(header, data);
-                transaction.Operation = null;
+                context.Complete(_kinematics.ForwardVelocityTransform(velocities));
             }
         }
     }

@@ -4,7 +4,7 @@ namespace Common
 {
     public static class DeclarationHelper
     {
-        public static void FillStringStaticFieldsWithNames(Type classType, string prefix)
+        public static void FillStringStaticFieldsWithNames(Type classType, string prefix = "")
         {
             foreach (var field in classType.GetFields())
             {

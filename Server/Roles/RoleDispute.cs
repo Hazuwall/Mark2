@@ -34,11 +34,11 @@ namespace Server.Roles
 
         public void Open(int timeMs)
         {
-            if (!_isResolved && _cancellationSource == null)
+            /*if (!_isResolved && _cancellationSource == null)
             {
                 _cancellationSource = new CancellationTokenSource();
                 _raiser.Raise(
-                    MessageHeaders.Events.RoleDisputeEvent,
+                    Common.Operations.Events.RoleDisputeEvent,
                     new RoleDisputeEventArgs
                     {
                         Status = RoleDisputeStatus.Opened,
@@ -46,7 +46,7 @@ namespace Server.Roles
                     },
                     Defendant, null);
                 TryClaimAsync(timeMs, _cancellationSource.Token).Start();
-            }
+            }*/
         }
 
         public void Defend()
@@ -79,12 +79,12 @@ namespace Server.Roles
 
         private void Resolve(Guid winner, Guid loser)
         {
-            _isResolved = true;
+            /*_isResolved = true;
             _registry.SetClientRole(winner, Role);
             _registry.SetClientRole(loser, Role.Reader);
 
             _raiser.Raise(
-                MessageHeaders.Events.RoleDisputeEvent,
+                Common.Operations.Events.RoleDisputeEvent,
                 new RoleDisputeEventArgs
                 {
                     Status = RoleDisputeStatus.Won,
@@ -92,13 +92,13 @@ namespace Server.Roles
                 },
                 winner, null);
             _raiser.Raise(
-                MessageHeaders.Events.RoleDisputeEvent,
+                Common.Operations.Events.RoleDisputeEvent,
                 new RoleDisputeEventArgs
                 {
                     Status = RoleDisputeStatus.Lost,
                     Role = Role
                 },
-                loser, null);
+                loser, null);*/
         }
     }
 }

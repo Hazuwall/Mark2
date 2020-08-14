@@ -7,12 +7,12 @@ namespace Plugins.Motion
     {
         public Vector6 GetCoords()
         {
-            throw new NotImplementedException();
+            return new Vector6();
         }
 
         public Vector6 GetVelocities()
         {
-            throw new NotImplementedException();
+            return new Vector6();
         }
     }
 }

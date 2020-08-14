@@ -2,20 +2,20 @@
 {
     public class Message
     {
-        public string Header { get; }
+        public string Title { get; }
         public object Payload { get; }
 
-        public Message(string header, object payload)
+        public Message(string title, object payload)
         {
-            Header = header;
+            Title = title;
             Payload = payload;
         }
 
-        public Message(string header) : this(header, null) { }
+        public Message(string title) : this(title, null) { }
 
         public override string ToString()
         {
-            return Header;
+            return Title;
         }
     }
 }
