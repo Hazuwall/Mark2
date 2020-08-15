@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class CookieAuthenticationMiddleware : IMiddleware
+    public class CookieIdentificationMiddleware : IMiddleware
     {
         public static readonly string ClientIdKey = "ClientId";
         public static readonly string ClientRoleKey = "ClientRole";
 
         private readonly IClientRoleRegistry _roleRegistry;
 
-        public CookieAuthenticationMiddleware(IClientRoleRegistry roleRegistry)
+        public CookieIdentificationMiddleware(IClientRoleRegistry roleRegistry)
         {
             _roleRegistry = roleRegistry;
         }

@@ -12,12 +12,12 @@ namespace Server.Controllers
     [Route("api/[controller]/[action]")]
     public class OperationController : ControllerBase
     {
-        private readonly IApiDeclaraionRegistry _operationRegistry;
+        private readonly IContractRegistry _contracts;
         private readonly OperationPipelineBuilder _builder;
 
-        public OperationController(IApiDeclaraionRegistry messageInfoRegistry, OperationPipelineBuilder builder)
+        public OperationController(IContractRegistry contracts, OperationPipelineBuilder builder)
         {
-            _operationRegistry = messageInfoRegistry;
+            _contracts = contracts;
             _builder = builder;
         }
 
@@ -30,20 +30,20 @@ namespace Server.Controllers
             }
 
             // input validation
-            if (!_operationRegistry.TryGetMessageInfo(dto.Title, out MessageInfoAttribute info))
+            if (!_contracts.TryGetOperationContract(dto.Title, out OperationContract contract))
             {
                 return StatusCode(StatusCodes.Status501NotImplemented, "An operation is not registered.");
             }
             Message initialOperation;
             try
             {
-                if (info.TIn.Equals(typeof(void)))
+                if (contract.InputType.Equals(typeof(void)))
                 {
                     initialOperation = new Message(dto.Title);
                 }
                 else
                 {
-                    initialOperation = new Message(dto.Title, dto.Payload.ToObject(info.TIn));
+                    initialOperation = new Message(dto.Title, dto.Payload.ToObject(contract.InputType));
                 }
             }
             catch (Exception ex)
@@ -52,8 +52,8 @@ namespace Server.Controllers
             }
 
             // authorization
-            var clientRole = (Role)HttpContext.Items[CookieAuthenticationMiddleware.ClientRoleKey];
-            if(info.Role > clientRole)
+            var clientRole = (Role)HttpContext.Items[CookieIdentificationMiddleware.ClientRoleKey];
+            if(contract.Role > clientRole)
             {
                 return Unauthorized();
             }
@@ -79,8 +79,8 @@ namespace Server.Controllers
             {
                 return StatusCode(StatusCodes.Status417ExpectationFailed, $"An operation {context.CurrentOperation.Title} was not processed.");
             }
-            else if ((info.TOut.Equals(typeof(void)) && context.Result != null)
-                || context.Result == null || !info.TOut.Equals(context.Result.GetType())) {
+            else if ((contract.OutputType.Equals(typeof(void)) && context.Result != null)
+                || context.Result == null || !contract.OutputType.Equals(context.Result.GetType())) {
                 return StatusCode(StatusCodes.Status417ExpectationFailed, "The output is invalid.");
             }
 

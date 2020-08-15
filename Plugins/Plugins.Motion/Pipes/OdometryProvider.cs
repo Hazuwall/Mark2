@@ -17,20 +17,20 @@ namespace Plugins.Motion.Pipes
         public void Process(OperationContext context)
         {
             var title = context.CurrentOperation.Title;
-            if(title == MotionOperations.Queries.Coords)
+            if(title == nameof(IMotionServiceContract.GetCoords))
             {
                 context.Complete(_odometry.GetCoords());
             }
-            else if(title == MotionOperations.Queries.Velocities)
+            else if(title == nameof(IMotionServiceContract.GetVelocities))
             {
                 context.Complete(_odometry.GetVelocities());
             }
-            else if (title == MotionOperations.Queries.AbsCoords)
+            else if (title == nameof(IMotionServiceContract.GetAbsCoords))
             {
                 var coords = _odometry.GetCoords();
                 context.Complete(_kinematics.ForwardPosTransform(coords));
             }
-            else if (title == MotionOperations.Queries.AbsVelocities)
+            else if (title == nameof(IMotionServiceContract.GetAbsVelocities))
             {
                 var velocities = _odometry.GetCoords();
                 context.Complete(_kinematics.ForwardVelocityTransform(velocities));

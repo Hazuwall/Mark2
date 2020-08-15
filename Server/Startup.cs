@@ -29,8 +29,9 @@ namespace Server
 
             services.AddControllers().AddNewtonsoftJson();
             services.AddSingleton<IClientRoleRegistry, ClientRoleRegistry>();
-            services.AddSingleton<IApiDeclaraionRegistry, ReflectionApiDeclarationRegistry>();
-            services.AddSingleton<CookieAuthenticationMiddleware>();
+            services.AddSingleton<IContractFactory, ContractFactory>();
+            services.AddSingleton<IContractRegistry, ContractRegistry>();
+            services.AddSingleton<CookieIdentificationMiddleware>();
             services.AddSingleton<OperationPipelineBuilder>();
             services.AddSingleton<IOperationPipelineBuilder, OperationPipelineBuilder>();
             services.AddScoped<IRoleDisputeFactory, RoleDisputeFactory>();
@@ -39,7 +40,7 @@ namespace Server
             Plugins.Motion.Startup.ConfigureServices(services);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, OperationPipelineBuilder pipelineBuilder)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, OperationPipelineBuilder pipelineBuilder, IContractRegistry contracts)
         {
             if (env.IsDevelopment())
             {
@@ -50,15 +51,22 @@ namespace Server
 
             app.UseRouting();
 
-            app.UseMiddleware<CookieAuthenticationMiddleware>();
+            app.UseMiddleware<CookieIdentificationMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
 
-            Plugins.Motion.Startup.Configure(pipelineBuilder, app.ApplicationServices);
+            Plugins.Motion.Startup.Configure(pipelineBuilder, contracts, app.ApplicationServices);
             pipelineBuilder.Build();
+
+            if (Log.IsEnabled(Serilog.Events.LogEventLevel.Information))
+            {
+                Log.Information("Registered operations: {0}", string.Join(", ", contracts.OperationContracts.Keys));
+                Log.Information("Registered events: {0}", string.Join(", ", contracts.EventContracts.Keys));
+                Log.Information("Registered data types: {0}", string.Join(", ", contracts.DataContracts.Keys));
+            }
         }
     }
 }

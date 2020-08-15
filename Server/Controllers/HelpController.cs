@@ -10,9 +10,9 @@ namespace Server.Controllers
     [Route("api/[controller]")]
     public class HelpController : ControllerBase
     {
-        private readonly IApiDeclaraionRegistry _registry;
+        private readonly IContractRegistry _registry;
 
-        public HelpController(IApiDeclaraionRegistry registry)
+        public HelpController(IContractRegistry registry)
         {
             _registry = registry;
         }
@@ -20,7 +20,7 @@ namespace Server.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_registry.MessageInfos);
+            return Ok(_registry.OperationContracts);
         }
     }
 }

@@ -27,13 +27,13 @@ namespace Server.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok((Role)HttpContext.Items[CookieAuthenticationMiddleware.ClientRoleKey]);
+            return Ok((Role)HttpContext.Items[CookieIdentificationMiddleware.ClientRoleKey]);
         }
 
         [HttpPost]
         public IActionResult Claim([FromBody] Role requestedRole)
         {
-            var client = (Guid)HttpContext.Items[CookieAuthenticationMiddleware.ClientIdKey];
+            var client = (Guid)HttpContext.Items[CookieIdentificationMiddleware.ClientIdKey];
             var currentRole = _registry.GetRole(client);
             var owner = _registry.GetOwner(requestedRole);
             if (currentRole == requestedRole)

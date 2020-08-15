@@ -1,5 +1,6 @@
 ﻿using Common;
 using Microsoft.Extensions.DependencyInjection;
+using Plugins.Motion.Contracts;
 using Plugins.Motion.Pipes;
 using SimpleInjector;
 using System;
@@ -15,8 +16,9 @@ namespace Plugins.Motion
             services.AddSingleton<OdometryPipe>();
         }
 
-        public static void Configure(IOperationPipelineBuilder pipeline, IServiceProvider services)
+        public static void Configure(IOperationPipelineBuilder pipeline, IContractRegistry contracts, IServiceProvider services)
         {
+            contracts.RegisterServiceContract<IMotionServiceContract>();
             pipeline.AddPipe(services.GetService<OdometryPipe>());
         }
     }
