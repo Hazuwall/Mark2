@@ -34,10 +34,11 @@ namespace Server
             services.AddSingleton<CookieIdentificationMiddleware>();
             services.AddSingleton<OperationPipelineBuilder>();
             services.AddSingleton<IOperationPipelineBuilder, OperationPipelineBuilder>();
-            services.AddScoped<IRoleDisputeFactory, RoleDisputeFactory>();
-            services.AddScoped<IEventRaiser, EventRaiser>();
-            
-            Plugins.Motion.Startup.ConfigureServices(services);
+            services.AddSingleton<IRoleDisputeFactory, RoleDisputeFactory>();
+            services.AddSingleton<IEventPublisher, EventPublisher>();
+
+            //Plugins.Motion.Startup.ConfigureServices(services);
+            Plugins.SubDemo.Startup.ConfigureServices(services);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, OperationPipelineBuilder pipelineBuilder, IContractRegistry contracts)
@@ -58,7 +59,8 @@ namespace Server
                 endpoints.MapControllers();
             });
 
-            Plugins.Motion.Startup.Configure(pipelineBuilder, contracts, app.ApplicationServices);
+            //Plugins.Motion.Startup.Configure(pipelineBuilder, contracts, app.ApplicationServices);
+            Plugins.SubDemo.Startup.Configure(pipelineBuilder, contracts, app.ApplicationServices);
             pipelineBuilder.Build();
 
             if (Log.IsEnabled(Serilog.Events.LogEventLevel.Information))

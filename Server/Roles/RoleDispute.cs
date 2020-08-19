@@ -8,7 +8,7 @@ namespace Server.Roles
 {
     public sealed class RoleDispute : IRoleDispute
     {
-        private readonly IEventRaiser _raiser;
+        private readonly IEventPublisher _raiser;
         private readonly IClientRoleRegistry _registry;
         private CancellationTokenSource _cancellationSource;
         private volatile bool _isResolved = false;
@@ -17,7 +17,7 @@ namespace Server.Roles
                            Guid defendant,
                            Role role,
                            IClientRoleRegistry registry,
-                           IEventRaiser raiser)
+                           IEventPublisher raiser)
         {
             Claimant = claimant;
             Defendant = defendant;

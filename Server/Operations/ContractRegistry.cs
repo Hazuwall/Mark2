@@ -1,5 +1,6 @@
 ﻿using Common;
 using NJsonSchema;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,17 +43,29 @@ namespace Server.Operations
             {
                 if (_factory.TryCreateOperationContract(method, out OperationContract operation))
                 {
-                    OperationContracts.Add(method.Name, operation);
-                    RegisterDataContract(operation.InputType);
-                    RegisterDataContract(operation.OutputType);
+                    if (!OperationContracts.TryAdd(method.Name, operation))
+                    {
+                        if (Log.IsEnabled(Serilog.Events.LogEventLevel.Warning))
+                        {
+                            Log.Warning("The operation {0} occurs multiple times.", method.Name);
+                        }
+                    }
+                    RegisterDataContract(operation.ParameterType);
+                    RegisterDataContract(operation.ReturnType);
                 }
             }
             foreach(var evnt in type.GetEvents())
             {
                 if(_factory.TryCreateEventContract(evnt, out EventContract contract))
                 {
-                    EventContracts.Add(evnt.Name, contract);
-                    RegisterDataContract(contract.ArgumentType);
+                    if(!EventContracts.TryAdd(evnt.Name, contract))
+                    {
+                        if (Log.IsEnabled(Serilog.Events.LogEventLevel.Warning))
+                        {
+                            Log.Warning("The event {0} occurs multiple times.", evnt.Name);
+                        }
+                    }
+                    RegisterDataContract(contract.ParameterType);
                 }
             }
         }

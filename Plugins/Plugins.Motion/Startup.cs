@@ -18,7 +18,7 @@ namespace Plugins.Motion
 
         public static void Configure(IOperationPipelineBuilder pipeline, IContractRegistry contracts, IServiceProvider services)
         {
-            contracts.RegisterServiceContract<IMotionServiceContract>();
+            contracts.RegisterServiceContract<IMotionPlugin>();
             pipeline.AddPipe(services.GetService<OdometryPipe>());
         }
     }

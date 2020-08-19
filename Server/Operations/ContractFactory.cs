@@ -35,10 +35,10 @@ namespace Server.Operations
                 }
                 else if (parameters.Length == 1)
                 {
-                    contract.InputType = parameters[0].ParameterType;
+                    contract.ParameterType = parameters[0].ParameterType;
                 }
 
-                contract.OutputType = method.ReturnType;
+                contract.ReturnType = method.ReturnType;
 
                 var displayAttribute = method.GetCustomAttribute<DisplayAttribute>();
                 contract.Description = displayAttribute?.Description;
@@ -63,7 +63,7 @@ namespace Server.Operations
             try
             {
                 contract = new EventContract();
-                contract.ArgumentType = evnt.EventHandlerType
+                contract.ParameterType = evnt.EventHandlerType
                     .GetMethod("Invoke")
                     .GetParameters()[1]
                     .ParameterType;

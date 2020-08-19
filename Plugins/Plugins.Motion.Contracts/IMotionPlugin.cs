@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Plugins.Motion.Contracts
 {
-    public interface IMotionServiceContract
+    public interface IMotionPlugin
     {
         [Display(Description = "Получить обобщённые координаты рабочего органа")]
         Vector6 GetCoords();

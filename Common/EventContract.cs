@@ -6,7 +6,12 @@ namespace Common
 {
     public class EventContract
     {
-        public Type ArgumentType { get; set; } = typeof(EventArgs);
-        public string Description { get; set; } = string.Empty;
+        public Type ParameterType { get; set; } = typeof(EventArgs);
+        public string Description { get; set; }
+
+        public override string ToString()
+        {
+            return $"Parameter: {ParameterType}";
+        }
     }
 }
