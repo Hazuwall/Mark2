@@ -27,7 +27,6 @@ namespace Server
                 .WriteTo.Console()
                 .CreateLogger();
 
-            services.AddControllers().AddNewtonsoftJson();
             services.AddSingleton<IClientRoleRegistry, ClientRoleRegistry>();
             services.AddSingleton<IContractFactory, ContractFactory>();
             services.AddSingleton<IContractRegistry, ContractRegistry>();
@@ -36,6 +35,13 @@ namespace Server
             services.AddSingleton<IOperationPipelineBuilder, OperationPipelineBuilder>();
             services.AddSingleton<IRoleDisputeFactory, RoleDisputeFactory>();
             services.AddSingleton<IEventPublisher, EventPublisher>();
+            services.AddScoped<GlobalExceptionFilterAttribute>();
+            services
+                .AddControllers(options =>
+                {
+                    options.Filters.Add(typeof(GlobalExceptionFilterAttribute));
+                })
+                .AddNewtonsoftJson();
 
             //Plugins.Motion.Startup.ConfigureServices(services);
             Plugins.SubDemo.Startup.ConfigureServices(services);

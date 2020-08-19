@@ -27,8 +27,8 @@ namespace Plugins.SubDemo
             contracts.RegisterServiceContract<ISubDemoPlugin>();
             // Дополняется конвейер обработки операций
             pipeline
-                .AddPipe(services.GetService<SubOfTheDayPipe>())
                 .AddPipe(services.GetService<HrPipe>())
+                .AddPipe(services.GetService<SubOfTheDayPipe>())
                 .AddPipe(services.GetService<OrderCounterPipe>())
                 .AddPipe(services.GetService<KitchenPipe>());
         }

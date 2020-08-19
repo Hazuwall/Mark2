@@ -4,7 +4,7 @@ using Server.Roles;
 using System;
 using System.Collections.Generic;
 
-namespace Server.Controllers
+namespace Server.Roles
 {
     [Route("api/[controller]/[action]")]
     public class RoleController : ControllerBase
@@ -24,7 +24,7 @@ namespace Server.Controllers
             };
         }
 
-        [HttpGet]
+        [HttpPost]
         public IActionResult Get()
         {
             return Ok((Role)HttpContext.Items[CookieIdentificationMiddleware.ClientRoleKey]);

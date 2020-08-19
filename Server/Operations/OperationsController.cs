@@ -7,15 +7,15 @@ using System.Threading.Tasks.Dataflow;
 using Server.Operations;
 using Serilog;
 
-namespace Server.Controllers
+namespace Server.Operations
 {
     [Route("api/[controller]/[action]")]
-    public class OperationController : ControllerBase
+    public class OperationsController : ControllerBase
     {
         private readonly IContractRegistry _contracts;
         private readonly OperationPipelineBuilder _builder;
 
-        public OperationController(IContractRegistry contracts, OperationPipelineBuilder builder)
+        public OperationsController(IContractRegistry contracts, OperationPipelineBuilder builder)
         {
             _contracts = contracts;
             _builder = builder;
@@ -32,18 +32,18 @@ namespace Server.Controllers
             // input validation
             if (!_contracts.TryGetOperationContract(dto.Title, out OperationContract contract))
             {
-                return StatusCode(StatusCodes.Status501NotImplemented, "An operation is not registered.");
+                return NotFound("An operation is not registered.");
             }
             Message initialOperation;
             try
             {
-                if (contract.InputType.Equals(typeof(void)))
+                if (contract.ParameterType.Equals(typeof(void)))
                 {
                     initialOperation = new Message(dto.Title);
                 }
                 else
                 {
-                    initialOperation = new Message(dto.Title, dto.Payload.ToObject(contract.InputType));
+                    initialOperation = new Message(dto.Title, dto.Payload.ToObject(contract.ParameterType));
                 }
             }
             catch (Exception ex)
@@ -55,33 +55,22 @@ namespace Server.Controllers
             var clientRole = (Role)HttpContext.Items[CookieIdentificationMiddleware.ClientRoleKey];
             if(contract.Role > clientRole)
             {
-                return Unauthorized();
+                return Forbid($"{contract.Role} role is required.");
             }
 
             // processing
             var context = new OperationContext(dto.Id, dto.Flags, initialOperation);
-            try
-            {
-                await _builder.Pipeline.SendAsync(context);
-                await Task.Delay(2000);
-            }
-            catch(Exception ex)
-            {
-                if (Log.IsEnabled(Serilog.Events.LogEventLevel.Error))
-                {
-                    Log.Error(ex, "An error occured while processing {0} operation.", context.CurrentOperation);
-                }
-                return Problem(ex.Message);
-            }
+            await _builder.Pipeline.SendAsync(context);
+            await Task.Delay(500);
 
             // output validation
-            if (context.CurrentOperation != null)
+            if (!context.IsCompleted)
             {
-                return StatusCode(StatusCodes.Status417ExpectationFailed, $"An operation {context.CurrentOperation.Title} was not processed.");
+                return Problem($"An operation {context.CurrentOperation.Title} was not processed.");
             }
-            else if ((contract.OutputType.Equals(typeof(void)) && context.Result != null)
-                || context.Result == null || !contract.OutputType.Equals(context.Result.GetType())) {
-                return StatusCode(StatusCodes.Status417ExpectationFailed, "The output is invalid.");
+            else if ((contract.ReturnType.Equals(typeof(void)) && context.Result != null)
+                || context.Result == null || !contract.ReturnType.Equals(context.Result.GetType())) {
+                return Problem("The return data is invalid.");
             }
 
             return Ok(context.Result);
