@@ -20,7 +20,7 @@ namespace Plugins.Motion
         public void Configure(IOperationPipelineBuilder pipeline, IContractRegistry contracts, IServiceProvider services)
         {
             contracts.RegisterServiceContract<IMotionPlugin>();
-            pipeline.AddPipe(services.GetService<OdometryPipe>());
+            pipeline.AddPipe<OdometryPipe>();
         }
     }
 }

@@ -59,13 +59,5 @@ namespace Server
                 where t.IsClass && !t.IsInterface && !t.IsAbstract && originalType.IsAssignableFrom(t)
                 select t;
         }
-
-        public static IEnumerable<IPluginStartup> GetPluginStartups(this IEnumerable<Assembly> assemblies)
-        {
-            return assemblies
-                .FindClassesOfType<IPluginStartup>()
-                .Select(startupType => (IPluginStartup)Activator.CreateInstance(startupType))
-                .OrderBy(startup => startup.Order);
-        }
     }
 }

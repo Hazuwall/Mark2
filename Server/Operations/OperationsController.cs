@@ -13,12 +13,12 @@ namespace Server.Operations
     public class OperationsController : ControllerBase
     {
         private readonly IContractRegistry _contracts;
-        private readonly OperationPipelineBuilder _builder;
+        private readonly OperationPipeline _pipeline;
 
-        public OperationsController(IContractRegistry contracts, OperationPipelineBuilder builder)
+        public OperationsController(IContractRegistry contracts, OperationPipeline pipeline)
         {
             _contracts = contracts;
-            _builder = builder;
+            _pipeline = pipeline;
         }
 
         [HttpPost]
@@ -59,21 +59,15 @@ namespace Server.Operations
             }
 
             // processing
-            var context = new OperationContext(dto.Id, dto.Flags, initialOperation);
-            await _builder.Pipeline.SendAsync(context);
-            await Task.Delay(500);
+            var result = await _pipeline.ExecuteAsync(dto.Id, dto.Flags, initialOperation);
 
             // output validation
-            if (!context.IsCompleted)
-            {
-                return Problem($"An operation {context.CurrentOperation.Title} was not processed.");
-            }
-            else if ((contract.ReturnType.Equals(typeof(void)) && context.Result != null)
-                || context.Result == null || !contract.ReturnType.Equals(context.Result.GetType())) {
+            if ((contract.ReturnType.Equals(typeof(void)) && result != null)
+                || result == null || !contract.ReturnType.Equals(result.GetType())) {
                 return Problem("The return data is invalid.");
             }
 
-            return Ok(context.Result);
+            return Ok(result);
         }
     }
 }

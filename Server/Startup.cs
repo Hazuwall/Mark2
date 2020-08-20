@@ -29,7 +29,9 @@ namespace Server
 
             _startups = ReflectionHelper
                 .LoadAssemblies("Plugins")
-                .GetPluginStartups()
+                .FindClassesOfType<IPluginStartup>()
+                .Select(startupType => (IPluginStartup)Activator.CreateInstance(startupType))
+                .OrderBy(startup => startup.Order)
                 .ToList();
         }
 
@@ -41,8 +43,8 @@ namespace Server
             services.AddSingleton<IContractFactory, ContractFactory>();
             services.AddSingleton<IContractRegistry, ContractRegistry>();
             services.AddSingleton<CookieIdentificationMiddleware>();
-            services.AddSingleton<OperationPipelineBuilder>();
-            services.AddSingleton<IOperationPipelineBuilder, OperationPipelineBuilder>();
+            services.AddSingleton<OperationPipeline>();
+            services.AddSingleton<IOperationPipelineBuilder, OperationPipeline>();
             services.AddSingleton<IRoleDisputeFactory, RoleDisputeFactory>();
             services.AddSingleton<IEventPublisher, EventPublisher>();
             services.AddScoped<GlobalExceptionFilterAttribute>();
@@ -59,7 +61,7 @@ namespace Server
             }
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, OperationPipelineBuilder pipelineBuilder, IContractRegistry contracts)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, OperationPipeline pipelineBuilder, IContractRegistry contracts)
         {
             if (env.IsDevelopment())
             {
