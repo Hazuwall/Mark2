@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Server.Operations
+namespace Server.Contracts
 {
     public class ContractRegistry : IContractRegistry
     {
@@ -39,7 +39,7 @@ namespace Server.Operations
         public void RegisterServiceContract<T>() where T : class
         {
             var type = typeof(T);
-            foreach(var method in type.GetMethods())
+            foreach (var method in type.GetMethods())
             {
                 if (_factory.TryCreateOperationContract(method, out OperationContract operation))
                 {
@@ -54,11 +54,11 @@ namespace Server.Operations
                     RegisterDataContract(operation.ReturnType);
                 }
             }
-            foreach(var evnt in type.GetEvents())
+            foreach (var evnt in type.GetEvents())
             {
-                if(_factory.TryCreateEventContract(evnt, out EventContract contract))
+                if (_factory.TryCreateEventContract(evnt, out EventContract contract))
                 {
-                    if(!EventContracts.TryAdd(evnt.Name, contract))
+                    if (!EventContracts.TryAdd(evnt.Name, contract))
                     {
                         if (Log.IsEnabled(Serilog.Events.LogEventLevel.Warning))
                         {

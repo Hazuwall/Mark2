@@ -4,10 +4,9 @@ using Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks.Dataflow;
-using Server.Operations;
 using Serilog;
 
-namespace Server.Operations
+namespace Server.Contracts
 {
     public class ContractsController : ControllerBase
     {

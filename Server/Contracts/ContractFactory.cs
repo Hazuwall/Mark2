@@ -9,7 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Server.Operations
+namespace Server.Contracts
 {
     public class ContractFactory : IContractFactory
     {
@@ -44,7 +44,7 @@ namespace Server.Operations
                 contract.Description = displayAttribute?.Description;
 
                 var roleAttribute = method.GetCustomAttribute<RoleAttribute>();
-                if(roleAttribute != null)
+                if (roleAttribute != null)
                 {
                     contract.Role = roleAttribute.Role;
                 }

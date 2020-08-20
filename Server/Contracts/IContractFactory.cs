@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Server.Operations
+namespace Server.Contracts
 {
     public interface IContractFactory
     {
