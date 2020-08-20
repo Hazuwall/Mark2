@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Plugins.Motion.Contracts
 {
     public struct Vector6
     {
+        [Display(Description = "Первая координата")]
         public double Q1;
         public double Q2;
         public double Q3;

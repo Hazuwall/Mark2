@@ -2,6 +2,6 @@
 {
     public interface IPipe
     {
-        void Process(Transaction transaction);
+        void Process(OperationContext context);
     }
 }

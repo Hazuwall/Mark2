@@ -6,10 +6,10 @@ namespace Server.Roles
 {
     public class RoleDisputeFactory : IRoleDisputeFactory
     {
-        private readonly IEventRaiser _raiser;
+        private readonly IEventPublisher _raiser;
         private readonly IClientRoleRegistry _registry;
 
-        public RoleDisputeFactory(IEventRaiser raiser, IClientRoleRegistry registry)
+        public RoleDisputeFactory(IEventPublisher raiser, IClientRoleRegistry registry)
         {
             _raiser = raiser;
             _registry = registry;

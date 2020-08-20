@@ -1,21 +1,26 @@
 ﻿using Common;
+using Microsoft.Extensions.DependencyInjection;
+using Plugins.Motion.Contracts;
 using Plugins.Motion.Pipes;
-using SimpleInjector;
+using System;
 
 namespace Plugins.Motion
 {
-    public static class Startup
+    public class Startup : IPluginStartup
     {
-        public static void Register(Container container)
+        public int Order => 0;
+
+        public void ConfigureServices(IServiceCollection services)
         {
-            container.Register<IOdometryProvider, OdometryProvider>();
-            container.Register<IKinematicsService, KinematicsService>();
-            container.Register<OdometryPipe>();
+            services.AddSingleton<IOdometryProvider, OdometryProvider>();
+            services.AddSingleton<IKinematicsService, KinematicsService>();
+            services.AddSingleton<OdometryPipe>();
         }
 
-        public static void Build(Container container, IPipelineBuilder pipeline)
+        public void Configure(IOperationPipelineBuilder pipeline, IContractRegistry contracts, IServiceProvider services)
         {
-            pipeline.AddPipe(container.GetInstance(typeof(OdometryPipe)) as IPipe);
+            contracts.RegisterServiceContract<IMotionPlugin>();
+            pipeline.AddPipe<OdometryPipe>();
         }
     }
 }
