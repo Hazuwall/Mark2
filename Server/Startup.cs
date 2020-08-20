@@ -76,7 +76,7 @@ namespace Server
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapControllerRoute("Default", "api/{controller}/{action=Index}");
             });
 
             foreach (var startup in _startups)

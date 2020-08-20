@@ -6,7 +6,6 @@ using System.Collections.Generic;
 
 namespace Server.Roles
 {
-    [Route("api/[controller]/[action]")]
     public class RoleController : ControllerBase
     {
         private readonly IClientRoleRegistry _registry;

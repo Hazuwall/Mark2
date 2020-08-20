@@ -9,7 +9,6 @@ using Serilog;
 
 namespace Server.Operations
 {
-    [Route("api/[controller]/[action]")]
     public class OperationsController : ControllerBase
     {
         private readonly IContractRegistry _contracts;
