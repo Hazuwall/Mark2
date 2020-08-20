@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugins.Motion", "Plugins\P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csproj", "{E76607F6-5CED-47EC-A265-AC076CEA9475}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubDemo", "Plugins\SubDemo\SubDemo.csproj", "{72C5A112-7D8E-41F7-AA49-554F3E61DF07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugins.SubDemo", "Plugins\Plugins.SubDemo\Plugins.SubDemo.csproj", "{72C5A112-7D8E-41F7-AA49-554F3E61DF07}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

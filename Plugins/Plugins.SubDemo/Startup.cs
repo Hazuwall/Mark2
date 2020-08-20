@@ -7,9 +7,11 @@ using System;
 
 namespace Plugins.SubDemo
 {
-    public static class Startup
+    public class Startup : IPluginStartup
     {
-        public static void ConfigureServices(IServiceCollection services)
+        public int Order => 0;
+
+        public void ConfigureServices(IServiceCollection services)
         {
             // Используемые сервисы регистрируются в DI контейнере
             services.AddSingleton<EmployeeRegistry>();
@@ -21,7 +23,7 @@ namespace Plugins.SubDemo
             services.AddSingleton<OrderCounterPipe>();
         }
 
-        public static void Configure(IOperationPipelineBuilder pipeline, IContractRegistry contracts, IServiceProvider services)
+        public void Configure(IOperationPipelineBuilder pipeline, IContractRegistry contracts, IServiceProvider services)
         {
             // Контракты операций, событий и данных автоматически регистрируются из контракта сервиса
             contracts.RegisterServiceContract<ISubDemoPlugin>();

@@ -8,25 +8,35 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Server.Operations;
 using Server.Roles;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Server
 {
     public class Startup
     {
+        private readonly List<IPluginStartup> _startups;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .CreateLogger();
+
+            _startups = ReflectionHelper
+                .LoadAssemblies("Plugins")
+                .GetPluginStartups()
+                .ToList();
         }
 
         public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.Console()
-                .CreateLogger();
-
             services.AddSingleton<IClientRoleRegistry, ClientRoleRegistry>();
             services.AddSingleton<IContractFactory, ContractFactory>();
             services.AddSingleton<IContractRegistry, ContractRegistry>();
@@ -43,8 +53,10 @@ namespace Server
                 })
                 .AddNewtonsoftJson();
 
-            //Plugins.Motion.Startup.ConfigureServices(services);
-            Plugins.SubDemo.Startup.ConfigureServices(services);
+            foreach(var startup in _startups)
+            {
+                startup.ConfigureServices(services);
+            }
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, OperationPipelineBuilder pipelineBuilder, IContractRegistry contracts)
@@ -65,8 +77,10 @@ namespace Server
                 endpoints.MapControllers();
             });
 
-            //Plugins.Motion.Startup.Configure(pipelineBuilder, contracts, app.ApplicationServices);
-            Plugins.SubDemo.Startup.Configure(pipelineBuilder, contracts, app.ApplicationServices);
+            foreach (var startup in _startups)
+            {
+                startup.Configure(pipelineBuilder, contracts, app.ApplicationServices);
+            }
             pipelineBuilder.Build();
 
             if (Log.IsEnabled(Serilog.Events.LogEventLevel.Information))

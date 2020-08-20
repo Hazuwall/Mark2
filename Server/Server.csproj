@@ -15,8 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
-    <ProjectReference Include="..\Plugins\Plugins.Motion\Plugins.Motion.csproj" />
-    <ProjectReference Include="..\Plugins\SubDemo\SubDemo.csproj" />
   </ItemGroup>
 
 
