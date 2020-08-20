@@ -49,6 +49,8 @@ namespace Server
             services.AddSingleton<IRoleDisputeFactory, RoleDisputeFactory>();
             services.AddSingleton<IEventPublisher, EventPublisher>();
             services.AddScoped<GlobalExceptionFilterAttribute>();
+            services.AddScoped<OperationValidationFilter>();
+            services.AddScoped<AuthorizationFilterAttribute>();
             services
                 .AddControllers(options =>
                 {

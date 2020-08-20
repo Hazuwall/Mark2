@@ -11,16 +11,16 @@ namespace Server.Operations
 {
     public class OperationsController : ControllerBase
     {
-        private readonly IContractRegistry _contracts;
         private readonly OperationPipeline _pipeline;
 
-        public OperationsController(IContractRegistry contracts, OperationPipeline pipeline)
+        public OperationsController(OperationPipeline pipeline)
         {
-            _contracts = contracts;
             _pipeline = pipeline;
         }
 
         [HttpPost]
+        [TypeFilter(typeof(OperationValidationFilter))]
+        [AuthorizationFilter]
         public async Task<IActionResult> Perform([FromBody] OperationDto dto)
         {
             if (!ModelState.IsValid)
@@ -28,43 +28,8 @@ namespace Server.Operations
                 return BadRequest();
             }
 
-            // input validation
-            if (!_contracts.TryGetOperationContract(dto.Title, out OperationContract contract))
-            {
-                return NotFound("An operation is not registered.");
-            }
-            Message initialOperation;
-            try
-            {
-                if (contract.ParameterType.Equals(typeof(void)))
-                {
-                    initialOperation = new Message(dto.Title);
-                }
-                else
-                {
-                    initialOperation = new Message(dto.Title, dto.Payload.ToObject(contract.ParameterType));
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
-            // authorization
-            var clientRole = (Role)HttpContext.Items[CookieIdentificationMiddleware.ClientRoleKey];
-            if(contract.Role > clientRole)
-            {
-                return Forbid($"{contract.Role} role is required.");
-            }
-
-            // processing
-            var result = await _pipeline.ExecuteAsync(dto.Id, dto.Flags, initialOperation);
-
-            // output validation
-            if ((contract.ReturnType.Equals(typeof(void)) && result != null)
-                || result == null || !contract.ReturnType.Equals(result.GetType())) {
-                return Problem("The return data is invalid.");
-            }
+            var operation = HttpContext.Items[OperationValidationFilter.OperationKey] as Message;
+            var result = await _pipeline.ExecuteAsync(dto.Id, dto.Flags, operation);
 
             return Ok(result);
         }
