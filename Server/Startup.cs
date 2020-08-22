@@ -21,8 +21,6 @@ namespace Server
 
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
-
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Console()
@@ -49,7 +47,14 @@ namespace Server
             services.AddSingleton<IRoleDisputeFactory, RoleDisputeFactory>();
             services.AddSingleton<IEventPublisher, EventPublisher>();
             services.AddScoped<OperationRequestHandler>();
-            services.AddControllers().AddNewtonsoftJson();
+            services
+                .AddControllers()
+                .AddNewtonsoftJson(options =>
+                {
+                    options.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
+                    options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+                    options.SerializerSettings.Converters.Add(new TypeJsonConverter());
+                });
 
             foreach(var startup in _startups)
             {
