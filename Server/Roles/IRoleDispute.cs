@@ -1,5 +1,6 @@
 ﻿using Common;
 using System;
+using System.Threading.Tasks;
 
 namespace Server.Roles
 {
@@ -10,7 +11,7 @@ namespace Server.Roles
         Guid Claimant { get; }
         Guid Defendant { get; }
         Role Role { get; }
-        void Open(int timeMs);
-        void Defend();
+        Task<bool> TryClaimAsync();
+        bool TryDefend();
     }
 }

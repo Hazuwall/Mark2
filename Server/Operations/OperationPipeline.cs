@@ -65,10 +65,10 @@ namespace Server.Operations
             }
         }
 
-        public Task<object> ExecuteAsync(Guid id, string[] flags, Message operation)
+        public Task<object> ExecuteAsync(Message operation, Guid id)
         {
             var tcs = new TaskCompletionSource<object>();
-            var context = new OperationContext(id, flags, operation, tcs);
+            var context = new OperationContext(operation, id, tcs);
             _firstBlock.SendAsync(context);
             return tcs.Task;
         }

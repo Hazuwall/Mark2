@@ -8,7 +8,9 @@ namespace Server.Roles
 {
     public sealed class RoleDispute : IRoleDispute
     {
-        private readonly IEventPublisher _raiser;
+        public readonly static int DefendTimeout = 2000;
+
+        private readonly IEventPublisher _publisher;
         private readonly IClientRoleRegistry _registry;
         private CancellationTokenSource _cancellationSource;
         private volatile bool _isResolved = false;
@@ -17,12 +19,12 @@ namespace Server.Roles
                            Guid defendant,
                            Role role,
                            IClientRoleRegistry registry,
-                           IEventPublisher raiser)
+                           IEventPublisher publisher)
         {
             Claimant = claimant;
             Defendant = defendant;
             Role = role;
-            _raiser = raiser;
+            _publisher = publisher;
             _registry = registry;
         }
 
@@ -32,73 +34,54 @@ namespace Server.Roles
         public bool IsResolved => _isResolved;
         public bool IsDefended { get; private set; }
 
-        public void Open(int timeMs)
-        {
-            /*if (!_isResolved && _cancellationSource == null)
-            {
-                _cancellationSource = new CancellationTokenSource();
-                _raiser.Raise(
-                    Common.Operations.Events.RoleDisputeEvent,
-                    new RoleDisputeEventArgs
-                    {
-                        Status = RoleDisputeStatus.Opened,
-                        Role = Role
-                    },
-                    Defendant, null);
-                TryClaimAsync(timeMs, _cancellationSource.Token).Start();
-            }*/
-        }
-
-        public void Defend()
+        public bool TryDefend()
         {
             if (!_isResolved && _cancellationSource != null && !_cancellationSource.IsCancellationRequested)
             {
                 _cancellationSource.Cancel();
                 _cancellationSource.Dispose();
                 _cancellationSource = null;
-                IsDefended = true;
                 Resolve(Defendant, Claimant);
+                IsDefended = true;
+                return true;
             }
+            return _isResolved && IsDefended;
         }
 
-        private async Task<bool> TryClaimAsync(int timeMs, CancellationToken token)
+        public async Task<bool> TryClaimAsync()
         {
-            try
+            if (!_isResolved && _cancellationSource == null)
             {
-                await Task.Delay(timeMs, token);
+                _cancellationSource = new CancellationTokenSource();
+                /*_publisher.Post(
+                    "DisputeEvent",
+                    new RoleDisputeEventArgs
+                    {
+                        Status = RoleDisputeStatus.Opened,
+                        Role = Role
+                    },
+                    Defendant, null));*/
+                try
+                {
+                    await Task.Delay(DefendTimeout, _cancellationSource.Token);
+                }
+                catch
+                {
+                    return false;
+                }
+                _cancellationSource.Dispose();
+                _cancellationSource = null;
+                Resolve(Claimant, Defendant);
+                return true;
             }
-            catch
-            {
-                return false;
-            }
-            _cancellationSource.Dispose();
-            _cancellationSource = null;
-            Resolve(Claimant, Defendant);
-            return true;
+            return _isResolved && !IsDefended;
         }
 
         private void Resolve(Guid winner, Guid loser)
         {
-            /*_isResolved = true;
+            _isResolved = true;
             _registry.SetClientRole(winner, Role);
             _registry.SetClientRole(loser, Role.Reader);
-
-            _raiser.Raise(
-                Common.Operations.Events.RoleDisputeEvent,
-                new RoleDisputeEventArgs
-                {
-                    Status = RoleDisputeStatus.Won,
-                    Role = Role
-                },
-                winner, null);
-            _raiser.Raise(
-                Common.Operations.Events.RoleDisputeEvent,
-                new RoleDisputeEventArgs
-                {
-                    Status = RoleDisputeStatus.Lost,
-                    Role = Role
-                },
-                loser, null);*/
         }
     }
 }

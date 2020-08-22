@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Server.Roles;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Server.Roles
 {
@@ -10,71 +11,70 @@ namespace Server.Roles
     {
         private readonly IClientRoleRegistry _registry;
         private readonly IRoleDisputeFactory _disputeFactory;
-        private readonly Dictionary<Role, IRoleDispute> _disputes;
 
         public RoleController(IClientRoleRegistry registry, IRoleDisputeFactory disputeFactory)
         {
             _registry = registry;
             _disputeFactory = disputeFactory;
-            _disputes = new Dictionary<Role, IRoleDispute>()
-            {
-                { Role.Writer, null },
-                { Role.Admin, null }
-            };
         }
 
-        [HttpPost]
-        public IActionResult Get()
+        [HttpGet]
+        public IActionResult Index()
         {
             return Ok((Role)HttpContext.Items[CookieIdentificationMiddleware.ClientRoleKey]);
         }
 
         [HttpPost]
-        public IActionResult Claim([FromBody] Role requestedRole)
+        public async Task<IActionResult> Claim(Role role)
         {
             var client = (Guid)HttpContext.Items[CookieIdentificationMiddleware.ClientIdKey];
             var currentRole = _registry.GetRole(client);
-            var owner = _registry.GetOwner(requestedRole);
-            if (currentRole == requestedRole)
+            var owner = _registry.GetOwner(role);
+            var success = true;
+
+            if (currentRole == role)
             {
-                return Ok(TryDefend(client, requestedRole));
+                if (role != Role.Reader)
+                {
+                    success = TryDefend(client, role);
+                }
             }
             else if (!owner.HasValue)
             {
-                _registry.SetClientRole(client, requestedRole);
-                return Ok(true);
+                _registry.SetClientRole(client, role);
             }
             else
             {
-                TryOpenDispute(client, owner.Value, requestedRole);
-                return Ok(false);
+                success = await TryClaimThroughDisputeAsync(client, owner.Value, role);
+            }
+
+            if (success)
+            {
+                return Ok();
+            }
+            else
+            {
+                return Conflict("The role is occupied.");
             }
         }
 
-        private bool TryOpenDispute(Guid claimant, Guid defendant, Role role)
+        private async Task<bool> TryClaimThroughDisputeAsync(Guid claimant, Guid defendant, Role role)
         {
-            var currentDispute = _disputes[role];
+            var currentDispute = _disputeFactory.GetLast(role);
             if (currentDispute == null || currentDispute.IsResolved)
             {
                 var dispute = _disputeFactory.Create(claimant, defendant, role);
-                dispute.Open(2000);
-                _disputes[role] = dispute;
-                return true;
+                return await dispute.TryClaimAsync();
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
         private bool TryDefend(Guid client, Role role)
         {
-            var currentDispute = _disputes[role];
+            var currentDispute = _disputeFactory.GetLast(role);
             if (currentDispute != null && currentDispute.Defendant == client)
             {
-                _disputes[role] = null;
-                currentDispute.Defend();
-                return currentDispute.IsResolved && currentDispute.IsDefended;
+                return currentDispute.TryDefend();
             }
             return true;
         }

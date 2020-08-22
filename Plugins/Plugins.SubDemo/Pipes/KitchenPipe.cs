@@ -28,13 +28,6 @@ namespace SubDemo.Pipes
             {
                 // Входные данные операции передаются в свойстве Payload в типе, соответствующему контракту операции
                 var recipe = context.CurrentOperation.Payload as Recipe;
-                // Флаги используются в качестве внештатной модификации работы конвейера клиентом
-                // только в крайнем случае, если это поведение по каким-то причинам нельзя зафиксировать в
-                // конфигурационном файле или получать вместе с запросом клиента в виде обычного параметра
-                if(context.Flags != null && context.Flags.Contains("HatesTomatos"))
-                {
-                    recipe.Ingridients.Remove("Помидоры");
-                }
                 var sandwich = new Sandwich()
                 {
                     Depiction = $"Вкусный сэндвич, включающий {string.Join(", ", recipe.Ingridients)}"

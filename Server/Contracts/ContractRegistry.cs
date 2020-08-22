@@ -73,7 +73,7 @@ namespace Server.Contracts
         private void RegisterDataContract(Type type)
         {
             var schema = JsonSchema.FromType(type).ToJson();
-            DataContracts.TryAdd(type.Name, schema);
+            DataContracts.TryAdd(type.FullName, schema);
         }
     }
 }
