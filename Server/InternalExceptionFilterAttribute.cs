@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class GlobalExceptionFilterAttribute : Attribute, IExceptionFilter
+    public class InternalExceptionFilterAttribute : Attribute, IExceptionFilter
     {
         public void OnException(ExceptionContext context)
         {
@@ -17,11 +17,19 @@ namespace Server
             {
                 Log.Error(context.Exception, "An error occured.");
             }
-            context.Result = new ContentResult
+
+            if (context.Exception is NotImplementedException)
             {
-                StatusCode = StatusCodes.Status500InternalServerError,
-                Content = context.Exception.Message
-            };
+                context.Result = new StatusCodeResult(StatusCodes.Status501NotImplemented);
+            }
+            else
+            {
+                context.Result = new ContentResult
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Content = context.Exception.Message
+                };
+            }
             context.ExceptionHandled = true;
         }
     }

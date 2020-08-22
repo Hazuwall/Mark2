@@ -9,18 +9,15 @@ namespace Common
         public readonly TaskCompletionSource<object> _completionSource;
 
         public OperationContext(Guid id,
-                                string[] flags,
                                 Message operation,
                                 TaskCompletionSource<object> completionSource)
         {
             Id = id;
-            Flags = flags;
             CurrentOperation = operation;
             _completionSource = completionSource;
         }
 
         public Guid Id { get; }
-        public string[] Flags { get; }
         public Message CurrentOperation { get; private set; }
         public bool IsCompleted { get; private set; } = false;
 

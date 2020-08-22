@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks.Dataflow;
 using Server.Operations;
 using Serilog;
+using Newtonsoft.Json.Linq;
 
 namespace Server.Operations
 {
@@ -19,9 +20,10 @@ namespace Server.Operations
         }
 
         [HttpPost]
+        [Route("api/operations/{title}")]
         [TypeFilter(typeof(OperationValidationFilter))]
         [AuthorizationFilter]
-        public async Task<IActionResult> Perform([FromBody] OperationDto dto)
+        public async Task<IActionResult> Perform(string title, Guid id, [FromBody] JToken payload=null)
         {
             if (!ModelState.IsValid)
             {
@@ -29,7 +31,7 @@ namespace Server.Operations
             }
 
             var operation = HttpContext.Items[OperationValidationFilter.OperationKey] as Message;
-            var result = await _pipeline.ExecuteAsync(dto.Id, dto.Flags, operation);
+            var result = await _pipeline.ExecuteAsync(id, operation);
 
             return Ok(result);
         }

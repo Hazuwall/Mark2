@@ -26,22 +26,23 @@ namespace Server
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            var dto = (OperationDto)context.ActionArguments["dto"];
+            var title = (string)context.ActionArguments["title"];
+            var payload = (JToken)context.ActionArguments["payload"];
 
-            if (!_contractRegistry.TryGetOperationContract(dto.Title, out _contract))
+            if (!_contractRegistry.TryGetOperationContract(title, out _contract))
             {
-                context.ModelState.AddModelError(nameof(dto.Title), "An operation is not registered.");
+                context.ModelState.AddModelError(nameof(title), "An operation is not registered.");
                 return;
             }
             context.HttpContext.Items.Add(OperationContractKey, _contract);
 
-            if(TryConvertToValidOperation(dto.Title, dto.Payload, _contract, out Message operation))
+            if(TryConvertToValidOperation(title, payload, _contract, out Message operation))
             {
                 context.HttpContext.Items.Add(OperationKey, operation);
             }
             else
             {
-                context.ModelState.AddModelError(nameof(dto.Payload), "Parameter data is invalid.");
+                context.ModelState.AddModelError(nameof(payload), "Parameter data is invalid.");
                 return;
             }
         }
