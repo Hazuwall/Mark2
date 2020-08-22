@@ -8,8 +8,8 @@ namespace Common
     {
         public readonly TaskCompletionSource<object> _completionSource;
 
-        public OperationContext(Guid id,
-                                Message operation,
+        public OperationContext(Message operation,
+                                Guid id,
                                 TaskCompletionSource<object> completionSource)
         {
             Id = id;

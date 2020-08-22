@@ -48,15 +48,8 @@ namespace Server
             services.AddSingleton<IOperationPipelineBuilder, OperationPipeline>();
             services.AddSingleton<IRoleDisputeFactory, RoleDisputeFactory>();
             services.AddSingleton<IEventPublisher, EventPublisher>();
-            services.AddScoped<GlobalExceptionFilterAttribute>();
-            services.AddScoped<OperationValidationFilter>();
-            services.AddScoped<AuthorizationFilterAttribute>();
-            services
-                .AddControllers(options =>
-                {
-                    options.Filters.Add(typeof(GlobalExceptionFilterAttribute));
-                })
-                .AddNewtonsoftJson();
+            services.AddScoped<OperationRequestHandler>();
+            services.AddControllers().AddNewtonsoftJson();
 
             foreach(var startup in _startups)
             {
@@ -64,14 +57,12 @@ namespace Server
             }
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, OperationPipeline pipelineBuilder, IContractRegistry contracts)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider services,
+            OperationPipeline pipelineBuilder, IContractRegistry contracts)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
             app.UseStaticFiles();
+
+            app.ConfigureExceptionHandler();
 
             app.UseRouting();
 
@@ -79,12 +70,14 @@ namespace Server
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute("Default", "api/{controller}/{action=Index}");
+                endpoints.MapPost("/api/operations/{title}",
+                    services.GetService<OperationRequestHandler>().InvokeAsync);
+                endpoints.MapControllerRoute("Default", "/api/{controller}/{action=Index}");
             });
 
             foreach (var startup in _startups)
             {
-                startup.Configure(pipelineBuilder, contracts, app.ApplicationServices);
+                startup.Configure(pipelineBuilder, contracts, services);
             }
             pipelineBuilder.Build();
 
